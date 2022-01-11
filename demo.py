@@ -8,6 +8,7 @@ import geemap.foliumap as geemap
 import restee as ree
 import matplotlib.pyplot as plt
 from create_imagecollection import *
+import json
 
 # Page Configuration
 st.set_page_config(layout="wide")
@@ -53,7 +54,7 @@ with row1_col2:
             .filterBounds(ee_pin)
         )
             m.set_center(float(long), float(lat), 8)
-            m.addLayer(aoi, {}, 'WWF HydroSHEDS (AOI)')
+            m.addLayer(aoi, {}, 'AOI (WWF HydroSHEDS)')
 
 
     with st.form("Run FIER"):
@@ -81,7 +82,7 @@ with row1_col2:
             .filterBounds(ee_pin)
         )
             m.set_center(float(long), float(lat), 8)
-            m.addLayer(aoi, {}, 'WWF HydroSHEDS (AOI)')
+            m.addLayer(aoi, {}, 'AOI (WWF HydroSHEDS)')
 
             # If uploaded json file for RESTEE
             if uploaded_file is not None:
@@ -90,8 +91,12 @@ with row1_col2:
                     with open(os.path.join(uploaded_file.name),"wb") as f:
                         f.write(uploaded_file.getbuffer())
 
+                with open(os.path.join(uploaded_file.name),"r") as f:
+                    credential = str(json.load(f)["project_id"])
+
+
                 # Set up restee
-                session = ree.EESession('unique-hour-314902','unique-hour-314902-d3ae767766e3.json')
+                session = ree.EESession(credential,uploaded_file.name)
                 domain = ree.Domain.from_ee_geometry(session, aoi.geometry(), resolution = 0.005)
 
                 # Generate image collection
@@ -113,6 +118,7 @@ with row1_col2:
                 #     st.pyplot(fig = plt)
                 st.write(S1_ImgCol_ASCENDING.size().getInfo())
                 st.write(S1_ImgCol_DESCENDING.size().getInfo())
+
 
 
 
