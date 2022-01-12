@@ -67,7 +67,7 @@ with row1_col2:
 
         end_date = st.date_input(
         "End Date",
-        datetime.date(2018, 1, 1))
+        datetime.date(2017, 6, 1))
 
         # Upload Json File
         uploaded_file = st.file_uploader("Update Cloud Project Json File:")
@@ -96,29 +96,22 @@ with row1_col2:
 
 
                 # Set up restee
-                session = ree.EESession(credential,uploaded_file.name)
-                domain = ree.Domain.from_ee_geometry(session, aoi.geometry(), resolution = 0.005)
+
 
                 # Generate image collection
 
-                S1_ImgCol_ASCENDING = initiate_imagecollection(aoi, str(start_date), str(end_date), orbit = 'ASCENDING')
-                S1_ImgCol_DESCENDING = initiate_imagecollection(aoi, str(start_date), str(end_date), orbit = 'DESCENDING')
+                S1_ImgCol = output_collection(aoi, str(start_date), str(end_date))
+                m.addLayer(S1_ImgCol.first().geometry(), {}, 'Image Collection Geometry')
+                session = ree.EESession(credential,uploaded_file.name)
+                domain = ree.Domain.from_ee_geometry(session, S1_ImgCol.first().geometry(), resolution = 0.005)
 
-                # Choose which orbit to download based on number of images:
-                # if S1_ImgCol_ASCENDING.size().getInfo() >=  S1_ImgCol_DESCENDING.size().getInfo():
-                #     img_stack = ree.imgcollection_to_xarray(session, domain, S1_ImgCol_ASCENDING, bands = ['VV'])
-                #     st.write('CHOSE ASCENDING')
-                # else:
-                #     img_stack = ree.imgcollection_to_xarray(session, domain, S1_ImgCol_DESCENDING, bands = ['VV'])
-                #     st.write('CHOSE DESCENDING')
-                # for i in range(10):
-                #     st.write(img_stack['time'].values[i])
-                #     fig = plt.figure(figsize = (12,10))
-                #     plt.imshow(img_stack.isel(time = i).VV)
-                #     st.pyplot(fig = plt)
-                st.write(S1_ImgCol_ASCENDING.size().getInfo())
-                st.write(S1_ImgCol_DESCENDING.size().getInfo())
 
+                img_stack = ree.imgcollection_to_xarray(session, domain, S1_ImgCol, bands = ['VV'])
+                for i in range(5):
+                    st.write(img_stack['time'].values[i])
+                    fig = plt.figure(figsize = (12,10))
+                    plt.imshow(img_stack.isel(time = i).VV)
+                    st.pyplot(fig = plt)
 
 
 
