@@ -9,6 +9,9 @@ import restee as ree
 import matplotlib.pyplot as plt
 from create_imagecollection import *
 import json
+from our_fierpy import *
+import fierpy
+import xarray as xr
 
 # Page Configuration
 st.set_page_config(layout="wide")
@@ -102,13 +105,19 @@ with row1_col2:
 
 
                 img_stack = ree.imgcollection_to_xarray(session, domain, S1_ImgCol, bands = ['VV'])
-                for i in range(5):
-                    st.write(img_stack['time'].values[i])
+                img_stack = img_stack.transpose("time", "lat", "lon")
+                a, b = reof(img_stack.VV, n_modes = 4)
+                for i in range(a.mode.shape[0]):
                     fig = plt.figure(figsize = (12,10))
-                    plt.imshow(img_stack.isel(time = i).VV)
-                    st.pyplot(fig = plt)
+                    plt.imshow(a.spatial_modes.isel(mode = i).values)
+                    st.pyplot(fig = fig)
+                    fig = plt.figure(figsize = (12,10))
+                    plt.plot(a.time, a.temporal_modes.isel(mode = i).values ,'--bo')
+                    st.pyplot(fig = fig)
 
 
+            else:
+                st.warning('File Missing')
 
 
 
