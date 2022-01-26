@@ -15,13 +15,7 @@ st.set_page_config(layout="wide")
 
 
 # Title and Description
-st.title("FIER")
-
-st.markdown(
-"""
-Description Here
-"""
-)
+st.title("Forecasting Inundation Extents using REOF Analysis (FIER)-Mekong")
 
 row1_col1, row1_col2 = st.columns([2, 1])
 # Set up Geemap
@@ -34,6 +28,7 @@ with row1_col1:
     crs = "epsg:4326"
 
     m.add_basemap("ROADMAP")
+
 
 with row1_col2:
     # Form
@@ -120,3 +115,8 @@ with row1_col2:
 
 with row1_col1:
     m.to_streamlit(height=600)
+    st.markdown(
+    """
+    Reference: Chang, C. H., Lee, H., Kim, D., Hwang, E., Hossain, F., Chishtie, F., ... & Basnayake, S. (2020). Hindcast and forecast of daily inundation extents using satellite SAR and altimetry data with rotated empirical orthogonal function analysis: Case study in Tonle Sap Lake Floodplain. Remote Sensing of Environment, 241, 111732.
+    """
+    )
